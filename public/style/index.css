@@ -1,7 +1,4 @@
-#loginPage {
-    display: block;
-}
 
-#registerPage, #coursePage, #lecturePage {
+#loginPage, #registerPage, #coursePage, #lecturePage {
     display: none;
 }

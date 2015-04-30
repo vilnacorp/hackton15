@@ -23,7 +23,9 @@ $(document).ready(function () {
                 liveLecture();
             })
         }
-    })
+    });
+
+    $(document).on('change', '.questionLike', updateSingleQuestions);
 
 });
 function startTimer() {
@@ -31,6 +33,8 @@ function startTimer() {
 }
 
 function liveLecture() {
+
+
     updateQuestions(function (data) {
         questions = data;
         switch (displayTab) {
@@ -42,6 +46,7 @@ function liveLecture() {
                 break;
         }
         var questionsToInject = createQuestionHtml();
+
         $('#questionsArea').children("ul").remove();
         $('#questionsArea').append(questionsToInject);
     });
@@ -51,19 +56,27 @@ function liveLecture() {
 
 function createQuestionHtml() {
     var template = '<ul>';
-    for (var i = 0; i < qustions.length; i++) {
+    var isCheck = '';
+    for (var i = 0; i < questions.length; i++) {
+        var question = questions[i];
+        if (question.voted) {
+            isCheck = 'checked';
+        } else {
+            isCheck = '';
+        }
         template
             += '<li class="singleQuestion">'
-            + '<span class="questionTime">' + questions[i].time.getHours() + ':' + questions[i].time.getMinutes() +
-            '</span>'
-            + '<span class="qustionName">' + questions[i].sender + '</span>'
-            + '<span class="qustionTitle">' + questions[i].questionTitle + '</span>'
-            + '<input type="checkbox" class="questionLike" id="like' + questions[i].questionId.toString() + '">'
-            + '<span class="questionRanking">' + questions[i].ranking + '</span>'
+            + '<span class="questionTime">' + question.time + '</span>'
+            + '<span class="questionName">' + question['sender'] + '</span>'
+            + '<span class="questionTitle">' + question.questionTitle + '</span>'
+            + '<input type="checkbox" class="questionLike" id="like' + question.questionId.toString() + '" ' + isCheck +
+            '>'
+            + '<span class="questionRanking">' + question.ranking + '</span>'
             + '</li>';
-        $('#like' + questions[i].questionId.toString()).change()
+        $('#like' + question.questionId.toString()).change(updateSingleQuestions)
 
     }
+
     template += '</ul>';
     return template;
 }

@@ -1,10 +1,10 @@
 var questions = [];
 
 function compareByVotes(first, second) {
-    if (first.votes > second.votes) {
+    if (first.ranking > second.ranking) {
         return -1;
     }
-    if (first.votes < second.votes) {
+    if (first.ranking < second.ranking) {
         return 1;
     }
     // first must be equal to second
@@ -13,10 +13,10 @@ function compareByVotes(first, second) {
 
 function compareByTime(first, second) {
     if (first.time > second.time) {
-        return -1;
+        return 1;
     }
     if (first.time < second.time) {
-        return 1;
+        return -1;
     }
     // first must be equal to second
     return 0;

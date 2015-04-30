@@ -48,8 +48,6 @@ exports.register = function (obj, handler) {
 exports.getName = function (obj, handler) {
 
 
-    console.log(obj);
-
     UserModel.findOne({'username': obj.username}, function (err, user) {
 
 
@@ -67,18 +65,17 @@ exports.getName = function (obj, handler) {
 
 };
 
-exports.isAdmin = function (obj, handler) {
+exports.validateUserName = function (obj, handler) {
 
 
     UserModel.findOne({
-        username: obj.username,
-        admin: true
+        username: obj.username
     }, function (error, user) {
 
         if (error || !user) {
-            handler(false);
+            handler(false, false);
         } else {
-            handler(true);
+            handler(true, user.admin);
         }
     });
 
@@ -133,7 +130,8 @@ exports.getQuestionsBySession = function (obj, handler) {
                     questionTitle: question.title,
                     ranking: question.votedByUsers.length,
                     status: question.status,
-                    date: question.date,
+                    time: question.date.getHours() + ":" + question.date.getMinutes() + ":" +
+                    question.date.getSeconds(),
                     sender: question.sender,
                     answered: question.answered,
                     voted: question.votedByUsers.indexOf(username) !== -1
@@ -158,8 +156,6 @@ exports.addSession = function (obj, handler) {
 
     session.save(function (err) {
 
-        console.log(err)
-
         if (err) {
 
             handler(true);
@@ -172,6 +168,13 @@ exports.addSession = function (obj, handler) {
     });
 
 };
+
+exports.addSession({
+    sessionId: 52005,
+    username: "vilna",
+    title: "vilna"
+}, function () {
+});
 
 exports.joinToSession = function (obj, handler) {
 

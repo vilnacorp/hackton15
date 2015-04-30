@@ -86,7 +86,7 @@ var question = {
 
     date: {
         type: Date,
-        default: Date.now()
+        default: new Date()
     },
 
     votedByUsers: {

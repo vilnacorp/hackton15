@@ -3,6 +3,8 @@ $(document).ready(function () {
     checkIfLogged(function (data) {
         if (data.status) {
             navigate("loginPage", "coursePage");
+        } else {
+            navigate("coursePage", "loginPage");
         }
     });
 
@@ -101,8 +103,9 @@ function courseValidation() {
 
         ajaxCourseNumber(courseNumber, function (err, data) {
             if (err) {
+                //no such course and not admin
                 alert("No such course number");
-            } else { //course exists
+            } else { //course exists or created by admin
                 currentCourseNumber = courseNumber;
                 liveLecture();
                 startTimer();
@@ -152,7 +155,7 @@ function ajaxLogin(username, password, callback) {
     });
 }
 
-function ajaxRegister(newUsername, newFullName, newPassword, email, callback) {
+function ajaxRegister(newUsername, newFullName, newPassword, email, newAdminKey, callback) {
     $.ajax({
         url: '/backend/register',
         type: 'post',
@@ -160,7 +163,8 @@ function ajaxRegister(newUsername, newFullName, newPassword, email, callback) {
             email: email,
             username: newUsername,
             password: newPassword,
-            name: newFullName
+            name: newFullName,
+            adminId: newAdminKey
         },
         success: function (data) {
             if (data.admin) {

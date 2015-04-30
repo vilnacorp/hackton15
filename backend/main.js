@@ -30,10 +30,11 @@ app.use(function (req, res, next) { // check admin cookie
     req.locals = {};
     if (req.cookies.username) {
 
-        req.locals.username = req.cookies.username;
+        data.validateUserName({username: req.cookies.username}, function (validUser, isAdmin) {
+            if (validUser) {
 
-
-        data.isAdmin({username: req.cookies.username}, function (isAdmin) {
+                req.locals.username = req.cookies.username;
+            }
             req.locals.admin = isAdmin;
             next();
         });
@@ -110,8 +111,29 @@ app.post("/session/join", function (req, res) {
         sessionId: req.param("sessionId")
     };
     data.joinToSession(obj, function (err) {
+
+        console.log(err);
+
+        console.log(req.locals);
+
         if (err) {
-            res.status(400);
+            if (req.locals.admin) {
+
+                data.addSession(obj, function (err, status) {
+                    if (err) {
+                        res.status(400);
+                    }
+                    else {
+                        responseObj.status = status;
+                    }
+                    res.send(responseObj);
+                });
+                return;
+
+            } else {
+
+                res.status(400);
+            }
         }
         else {
             responseObj.status = "ok";
@@ -134,8 +156,9 @@ app.post("/session/:id/question", function (req, res) {
             username: req.locals.username
         };
 
-
         data.addQuestion(obj, function (err, questionId) {
+
+
             if (err) {
                 res.send();
                 res.status(400);
@@ -149,7 +172,8 @@ app.post("/session/:id/question", function (req, res) {
     };
 
 
-    if (!req.body.anonymous) {
+    if (!req.body.anonymous || req.body.anonymous === "false") {
+
         data.getName({username: req.locals.username}, func);
     }
     else {
@@ -242,17 +266,18 @@ app.post("/register", function (req, res) {
     });
 });
 
-app.get("logged", function (req, res) {
+app.get("/logged", function (req, res) {
 
     var obj = {};
 
     if (req.locals.username) {
         obj.status = true;
+        obj.admin = req.locals.admin;
     } else {
         obj.status = false;
     }
 
-    res.send();
+    res.send(obj);
 
 });
 

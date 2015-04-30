@@ -7,6 +7,8 @@
     <script src="/controllers/lecture.js"></script>
     <script src="/controllers/login.js"></script>
     <script src="/controllers/main.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <title>Qrank - by Vilna Corp.</title>
 </head>
 <body>
@@ -59,7 +61,7 @@
     </div>
 
     <div id="enterNewQuestions">
-        <textarea id="newQuestion">Enter your Question</textarea>
+        <textarea id="newQuestion" onfocus="RemoveText(this);">Enter your Question</textarea>
         <br>
         <input type="checkbox" id="withName">Anonymous Name
         <br>

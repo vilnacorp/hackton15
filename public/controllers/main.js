@@ -5,5 +5,8 @@ function navigate(formerPage, nextPage) {
     $('#' + nextPage).fadeIn();
 }
 
+function RemoveText(obj) {
+    obj.value = '';
+}
 
 
