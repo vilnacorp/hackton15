@@ -4,7 +4,7 @@ var Schemda = mongoose.Schema;
 
 var userSchema = new Schemda({
 
-    userName: {
+    usermame: {
         type: String,
         unique: true,
         required: true

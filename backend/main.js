@@ -45,7 +45,26 @@ app.post("/login", function (req, res) {
             break;
 
     }
-
     res.send(responseObj);
 
 });
+
+app.post("/register", function (req, res) {
+    var obj = {
+        username: req.param("username"),
+        password: req.param("password"),
+        email: req.param("email"),
+        name: req.param("name"),
+        admin: isValidAdminId(req.param("adminId"))
+    };
+    data.register(obj);
+});
+
+function isValidAdminId(id) {
+    if (id === "555" || id === "666" || id === "vilna") {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
