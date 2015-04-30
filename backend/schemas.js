@@ -80,8 +80,9 @@ var Question = {
         type: String
     },
 
-    status: {
-        type: Number
+    answered: {
+        type: Boolean,
+        default: false
     },
 
     date: {

@@ -9,31 +9,19 @@ var QuestionModel = schemas.QuestionModel;
 
 exports.validateLogin = function (obj, handler) {
 
-    UserModel.findOne({'username': obj.userName}, function (err, user) {
+    UserModel.findOne({
+        'username': obj.userName,
+        "password": obj.password
+    }, function (err, user) {
 
         if (!err) {
 
-            handler(loginStatus.ERROR.NO_USER);
+            handler(err);
 
         } else {
 
-            if (user.password === obj.toObject().password) {
+            handler(null, user.admin);
 
-                if (user.admin) {
-
-                    handler(loginStatus.ADMIN);
-
-                } else {
-
-                    handler(loginStatus.USER);
-
-                }
-
-            } else {
-
-                handler(loginStatus.BAD_PASSWORD);
-
-            }
         }
     });
 
@@ -45,11 +33,27 @@ exports.register = function (obj, handler) {
 
     user.save(function (err) {
         if (err) {
-            handler(registerStatus.ERROR);
+            handler(err);
         } else {
-            handler(registerStatus.OK);
+            handler(null, user.admin);
         }
     })
+};
+
+exports.getName = function (obj, handler) {
+
+    UserModel.findOne({'username': obj.userName}, function (err, user) {
+
+        if (!err) {
+
+            handler(loginStatus.ERROR.NO_USER);
+
+        } else {
+
+            handler(null, user.fullName);
+        }
+    });
+
 };
 
 exports.isAdmin = function (obj, handler) {
@@ -125,22 +129,108 @@ exports.addSession = function (obj, handler) {
         createdBy: mongoose.Types.ObjectId(obj.username)
     });
 
+    session.save(function (err) {
+
+        if (err) {
+
+            handler(err);
+
+        } else {
+
+            handler(null, "saved");
+
+        }
+    });
+
 };
 
-var loginStatus = {
-    ADMIN: 0,
-    USER: 1,
-    ERROR: {
-        NO_USER: 0,
-        BAD_PASSWORD: 1
-    }
+exports.joinToSession = function (obj, handler) {
+
+    var sessionId = obj.sessionId;
+    var username = obj.username;
+
+    SessionModel.findOne({"courseNumber": sessionId}).exec(function (err, session) {
+
+        if (err) {
+            handler(err);
+        } else {
+
+
+            UserModel.findAndUpdate({"username": username},
+                {
+                    $push: {sessions: mongoose.Types.ObjectId(obj.sessionId)}
+                },
+                function (err) {
+                    handler(err);
+                }
+            );
+        }
+
+    });
+
 };
 
-exports.loginStatus = loginStatus;
+exports.addQuestion = function (obj, handler) {
 
-var registerStatus = {
-    ERROR: 1,
-    OK: 0
+    var question = new QuestionModel({
+        "courseNumber": obj.sessionId,
+        "title": obj.title,
+        "sender": obj.sender
+    });
+
+    question.save(function (err, q) {
+
+        if (err) {
+            handler(err);
+        } else {
+            handler(null, q._id);
+        }
+    });
+
 };
 
-exports.registerStatus = registerStatus;
+exports.voteToQuestion = function (obj, handler) {
+
+    var username = obj.username;
+    var questionId = obj.questionId;
+
+    QuestionModel.findById(questionId, function (err, question) {
+
+        if (err) {
+            handler(err);
+        } else {
+
+            var type = question.votedByUsers.indexOf(username) !== -1 ? $pop : $push;
+
+            var update = {};
+            update[type] = {votedByUsers: username};
+            QuestionModel.findByIdAndUpdate(questionId, {"username": username},
+                update,
+                function (err) {
+                    handler(err);
+                }
+            );
+        }
+
+    });
+
+};
+
+exports.answerQuestion = function (obj, handler) {
+
+    var questionId = obj.questionId;
+
+    QuestionModel.findByIdAndUpdate(questionId, {"answered": true}, function (err, question) {
+
+        if (err) {
+
+            handler(err);
+
+        } else {
+
+            handler();
+        }
+
+    });
+
+};

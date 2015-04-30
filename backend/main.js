@@ -17,9 +17,11 @@ app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({extended: true}));
 
-app.use(function (req, res, next) {
+app.use(function (req, res, next) { // check admin cookie
 
-    var user = res.cookie.userId;
+    var user = res.cookie.username;
+
+    res.params.username = user;
 
     data.isAdmin(user, function (res) {
 
