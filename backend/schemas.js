@@ -16,18 +16,17 @@ var userSchema = new Schemda({
 
     password: {
         type: String,
-        unique: true,
         required: true
     },
 
 
-    mail: {
+    email: {
         type: String,
         unique: true,
         required: true
     },
 
-    fullName: {
+    name: {
         type: String
     },
 
@@ -38,7 +37,7 @@ var userSchema = new Schemda({
 
     sessions: {
         type: [{
-            type: ObjectId,
+            type: Schemda.Types.ObjectId,
             ref: SESSION
         }]
     }
@@ -58,14 +57,13 @@ var sessions = {
     },
 
     createBy: {
-        type: Schemda.Types.ObjectId,
-        ref: USER
+        type: String
     }
 
 
 };
 
-var Question = {
+var question = {
 
     courseNumber: {
         type: Schemda.Types.ObjectId,
@@ -73,7 +71,8 @@ var Question = {
     },
 
     title: {
-        type: String
+        type: String,
+        required: true
     },
 
     sender: {

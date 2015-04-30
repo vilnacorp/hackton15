@@ -1,5 +1,7 @@
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/test');
+mongoose.connect('mongodb://localhost/test3', function (err) {
+
+});
 
 
 var schemas = require('./schemas');
@@ -9,14 +11,16 @@ var QuestionModel = schemas.QuestionModel;
 
 exports.validateLogin = function (obj, handler) {
 
+
     UserModel.findOne({
-        'username': obj.userName,
+        'username': obj.username,
         "password": obj.password
     }, function (err, user) {
 
-        if (!err) {
+        if (err || !user) {
 
-            handler(err);
+            console.log(user ? "user exist" : "user don't exist");
+            handler(true);
 
         } else {
 
@@ -31,26 +35,33 @@ exports.register = function (obj, handler) {
 
     var user = new UserModel(obj);
 
-    user.save(function (err) {
-        if (err) {
-            handler(err);
+    user.save(function (err, u) {
+        if (err || !u) {
+
+            handler(true);
         } else {
-            handler(null, user.admin);
+            handler(null, u.admin);
         }
     })
 };
 
 exports.getName = function (obj, handler) {
 
-    UserModel.findOne({'username': obj.userName}, function (err, user) {
 
-        if (!err) {
+    console.log(obj);
 
-            handler(loginStatus.ERROR.NO_USER);
+    UserModel.findOne({'username': obj.username}, function (err, user) {
+
+
+        console.log(user)
+
+        if (err || !user) {
+
+            handler(true);
 
         } else {
 
-            handler(null, user.fullName);
+            handler(null, user.name);
         }
     });
 
@@ -58,12 +69,16 @@ exports.getName = function (obj, handler) {
 
 exports.isAdmin = function (obj, handler) {
 
-    UserModel.findOne({userName: obj.username}, function (error, user) {
 
-        if (error) {
+    UserModel.findOne({
+        username: obj.username,
+        admin: true
+    }, function (error, user) {
+
+        if (error || !user) {
             handler(false);
         } else {
-            handler(user.admin);
+            handler(true);
         }
     });
 
@@ -71,12 +86,14 @@ exports.isAdmin = function (obj, handler) {
 
 exports.getSessions = function (obj, handler) {
 
-    UserModel.findOne({userName: obj.username}).populate('sessions').exec(function (error, user) {
+
+    UserModel.findOne({"userName": obj.username}).populate('sessions').exec(function (err, user) {
 
 
-        if (err) {
-            handler(error);
+        if (err || !user) {
+            handler(true);
         } else {
+
             handler(null, user.toObject().sessions);
         }
 
@@ -89,35 +106,45 @@ exports.getQuestionsBySession = function (obj, handler) {
     var username = obj.username;
     var courseNumber = obj.sessionId;
 
-    var now = Date.now();
+    var now = new Date();
 
-    QuestionModel.find({
-        "courseNumber": courseNumber,
-        "date": {
-            "$gte": new Date(now.getYear(), now.getMonth(), now.getDay()),
-            "$lt": new Date(now.getYear(), now.getMonth(), now.getDay() + 1)
+    SessionModel.findOne({"courseNumber": courseNumber}, function (err, session) {
+
+        if (err) {
+            handler(false);
+            return;
         }
-    }).populate("votedByUsers").exec(function (error, questions) {
 
-        if (error) {
-            handler(error);
-        } else {
+        //
+        //,
+        //"date": {
+        //    "$gte": new Date(now.getFullYear(), now.getMonth(), now.getDay()),
+        //        "$lt": new Date(now.getFullYear(), now.getMonth(), now.getDay() + 1)
+
+        QuestionModel.find({
+            "courseNumber": session._id
+        }).exec(function (error, questions) {
+
             var res = [];
             for (var i = 0; i < questions.length; i++) {
                 var question = questions[i];
                 res.push({
+                    questionId: question._id,
                     questionTitle: question.title,
                     ranking: question.votedByUsers.length,
                     status: question.status,
                     date: question.date,
                     sender: question.sender,
+                    answered: question.answered,
                     voted: question.votedByUsers.indexOf(username) !== -1
                 });
             }
             handler(null, res);
-        }
+
+        });
 
     });
+
 
 };
 
@@ -126,14 +153,16 @@ exports.addSession = function (obj, handler) {
     var session = new SessionModel({
         courseNumber: obj.sessionId,
         title: obj.title,
-        createdBy: mongoose.Types.ObjectId(obj.username)
+        createdBy: obj.username
     });
 
     session.save(function (err) {
 
+        console.log(err)
+
         if (err) {
 
-            handler(err);
+            handler(true);
 
         } else {
 
@@ -151,14 +180,15 @@ exports.joinToSession = function (obj, handler) {
 
     SessionModel.findOne({"courseNumber": sessionId}).exec(function (err, session) {
 
-        if (err) {
-            handler(err);
+        if (err || !session) {
+
+            handler(true);
         } else {
 
 
-            UserModel.findAndUpdate({"username": username},
+            UserModel.findOneAndUpdate({"username": username},
                 {
-                    $push: {sessions: mongoose.Types.ObjectId(obj.sessionId)}
+                    $push: {sessions: session._id}
                 },
                 function (err) {
                     handler(err);
@@ -172,19 +202,28 @@ exports.joinToSession = function (obj, handler) {
 
 exports.addQuestion = function (obj, handler) {
 
-    var question = new QuestionModel({
-        "courseNumber": obj.sessionId,
-        "title": obj.title,
-        "sender": obj.sender
-    });
 
-    question.save(function (err, q) {
+    SessionModel.findOne({"courseNumber": obj.sessionId}, function (err, session) {
 
         if (err) {
-            handler(err);
-        } else {
-            handler(null, q._id);
+            handler(false);
+            return;
         }
+        var question = new QuestionModel({
+            "courseNumber": session._id,
+            "title": obj.questionTitle,
+            "sender": obj.sender,
+            "votedByUsers": [obj.username]
+        });
+
+        question.save(function (err, q) {
+
+            if (err || !q) {
+                handler(true);
+            } else {
+                handler(null, q._id);
+            }
+        });
     });
 
 };
@@ -196,20 +235,28 @@ exports.voteToQuestion = function (obj, handler) {
 
     QuestionModel.findById(questionId, function (err, question) {
 
-        if (err) {
-            handler(err);
+        if (err || !question) {
+            handler(true);
         } else {
 
-            var type = question.votedByUsers.indexOf(username) !== -1 ? $pop : $push;
+            var number = question.votedByUsers.indexOf(username);
 
-            var update = {};
-            update[type] = {votedByUsers: username};
-            QuestionModel.findByIdAndUpdate(questionId, {"username": username},
-                update,
-                function (err) {
-                    handler(err);
+            if (number !== -1) {
+                question.votedByUsers.splice(number, 1);
+            } else {
+                question.votedByUsers.push(username);
+            }
+
+            question.save(function (err) {
+
+                if (err) {
+                    handler(err)
+                } else {
+                    handler(false)
                 }
-            );
+            });
+
+
         }
 
     });
@@ -222,9 +269,10 @@ exports.answerQuestion = function (obj, handler) {
 
     QuestionModel.findByIdAndUpdate(questionId, {"answered": true}, function (err, question) {
 
-        if (err) {
+        if (err || !question) {
 
-            handler(err);
+
+            handler(true);
 
         } else {
 

@@ -1,4 +1,3 @@
-x
 /**
  * Created by danny on 30/04/15.
  */
@@ -10,30 +9,42 @@ var bodyParser = require('body-parser');
 var data = require('./data');
 
 var app = express();
+var morgan = require('morgan');
+
 
 app.use(cookieParser());
+
 
 app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({extended: true}));
 
+
+app.use(morgan('combined'));
+
 app.use(function (req, res, next) { // check admin cookie
 
-    var user = res.cookie.username;
+    req.locals = {};
+    if (req.cookies.username) {
 
-    res.params.username = user;
+        req.locals.username = req.cookies.username;
 
-    data.isAdmin(user, function (res) {
 
-        res.params.admin = res;
+        data.isAdmin({username: req.cookies.username}, function (isAdmin) {
+            req.locals.admin = isAdmin;
+            next();
+        });
+    } else {
+
+        req.locals.admin = false;
         next();
-    });
 
+    }
 
 });
 
 app.get("/session", function (req, res) {
-    var obj = {username: res.params.username};
+    var obj = {username: req.locals.username};
 
     data.getSessions(obj, function (err, sessions) {
         if (err) {
@@ -48,14 +59,20 @@ app.get("/session", function (req, res) {
 app.post("/session", function (req, res) {
     var responseObj = {};
 
-    if (!res.params.isAdmin) {
+    if (!req.locals.admin) {
         res.status(401).send();
+
         return;
     }
+
+
     var obj = {
         title: req.param("title"),
-        username: res.params.username
+        username: req.locals.username,
+        sessionId: req.body.sessionId
     };
+
+
     data.addSession(obj, function (err, status) {
         if (err) {
             res.status(400);
@@ -69,8 +86,8 @@ app.post("/session", function (req, res) {
 
 app.get("/session/:id", function (req, res) {
     var obj = {
-        username: res.params.username,
-        sessionId: res.params.id
+        username: req.locals.username,
+        sessionId: req.params.id
     };
     data.getQuestionsBySession(obj, function (err, questions) {
         if (err) {
@@ -83,18 +100,18 @@ app.get("/session/:id", function (req, res) {
 });
 
 app.post("/session/join", function (req, res) {
+
     var responseObj = {};
     var obj = {
-        username: res.params.username,
+        username: req.locals.username,
         sessionId: req.param("sessionId")
     };
-
-    data.joinToSession(obj, function (err, status) {
+    data.joinToSession(obj, function (err) {
         if (err) {
             res.status(400);
         }
         else {
-            responseObj.status = status;
+            responseObj.status = "ok";
         }
         res.send(responseObj);
     });
@@ -102,25 +119,34 @@ app.post("/session/join", function (req, res) {
 
 app.post("/session/:id/question", function (req, res) {
     var responseObj = {};
+
+
     var func = function (err, name) {
+
+
         var obj = {
-            questionTitle: req.param("questionTitle"),
+            questionTitle: req.body.questionTitle,
             sessionId: req.params.id,
-            sender: name
+            sender: name,
+            username: req.locals.username
         };
+
+
         data.addQuestion(obj, function (err, questionId) {
             if (err) {
                 res.status(400);
             }
             else {
                 responseObj.questionId = questionId;
-                res.send(responseObj);
             }
+
+            res.send(responseObj);
         });
     };
 
-    if (!req.param("anonymous")) {
-        data.getName(userId, func);
+
+    if (!req.body.anonymous) {
+        data.getName({username: req.locals.username}, func);
     }
     else {
         func(null, "");
@@ -130,9 +156,10 @@ app.post("/session/:id/question", function (req, res) {
 app.put("/session/:id/question/:qid/vote", function (req, res) {
     var responseObj = {};
     var obj = {
-        sessionId: res.params.id,
-        questionId: res.params.qid,
-        type: req.param("type")
+        sessionId: req.params.id,
+        questionId: req.params.qid,
+        type: req.param("type"),
+        username: req.locals.username
     };
     data.voteToQuestion(obj, function (err, newRank) {
         if (err) {
@@ -146,26 +173,33 @@ app.put("/session/:id/question/:qid/vote", function (req, res) {
 });
 
 app.put("/session/:id/question/:qid/answer", function (req, res) {
-    var responseObj = {};
+
     var obj = {
-        sessionId: res.params.id,
-        questionId: res.params.qid
+        sessionId: req.params.id,
+        questionId: req.params.qid
     };
-    data.answerQuestion(obj, function (err) {
-        if (err) {
-            res.status(400);
-        }
-        res.send();
-    });
+
+    if (req.locals.admin) {
+
+        data.answerQuestion(obj, function (err) {
+            if (err) {
+                res.status(400);
+            }
+        });
+    } else {
+        res.status(401);
+    }
+
+    res.send({});
 
 
 });
 
 app.post("/login", function (req, res) {
-    var param = req.param("username");
+    var username = req.param("username");
     var responseObj = {};
     var obj = {
-        username: param,
+        username: username,
         password: req.param("password")
     };
 
@@ -175,21 +209,22 @@ app.post("/login", function (req, res) {
         }
         else {
             responseObj.admin = admin;
-            res.cookie('username', param);
+            res.cookie('username', username);
         }
         res.send(responseObj);
     });
 });
 
 app.post("/register", function (req, res) {
+
     var responseObj = {};
-    var username = req.param("username");
+    var username = req.body.username;
     var obj = {
         username: username,
-        password: req.param("password"),
-        email: req.param("email"),
-        name: req.param("name"),
-        admin: isValidAdminId(req.param("adminId"))
+        password: req.body.password,
+        email: req.body.email,
+        name: req.body.name,
+        admin: isValidAdminId(req.body.adminId)
     };
     data.register(obj, function (err, admin) {
         if (err) {
@@ -204,5 +239,8 @@ app.post("/register", function (req, res) {
 });
 
 function isValidAdminId(id) {
-    return !!(id === "555" || id === "666" || id === "vilna");
+    return (id === "555" || id === "666" || id === "vilna");
 }
+
+
+app.listen(8080);
