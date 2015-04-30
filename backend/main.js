@@ -9,6 +9,9 @@ var bodyParser = require('body-parser');
 var data = require('./data');
 
 var app = express();
+
+exports.backend = app;
+
 var morgan = require('morgan');
 
 
@@ -134,6 +137,7 @@ app.post("/session/:id/question", function (req, res) {
 
         data.addQuestion(obj, function (err, questionId) {
             if (err) {
+                res.send();
                 res.status(400);
             }
             else {
@@ -238,9 +242,20 @@ app.post("/register", function (req, res) {
     });
 });
 
+app.get("logged", function (req, res) {
+
+    var obj = {};
+
+    if (req.locals.username) {
+        obj.status = true;
+    } else {
+        obj.status = false;
+    }
+
+    res.send();
+
+});
+
 function isValidAdminId(id) {
     return (id === "555" || id === "666" || id === "vilna");
 }
-
-
-app.listen(8080);

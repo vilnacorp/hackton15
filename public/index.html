@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="style/index.css"/>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="model.js"></script>
+    <script src="/controllers/lecture.js"></script>
+    <script src="/controllers/login.js"></script>
+    <script src="/controllers/main.js"></script>
+    <title>Qrank - by Vilna Corp.</title>
+</head>
+<body>
+
+<img src="/style/logo.png" id="logo"/>
+<br>
+
+<div id='loginPage'>
+    <input type="text" placeholder="Username" id="username">
+    <br>
+    <input type="password" placeholder="Password" id="password">
+    <br>
+    <button id="login">Log in</button>
+    <button id="register">Create an account</button>
+</div>
+
+<div id='registerPage'>
+
+    <input type="text" placeholder="Username" id="newUsername">
+    <br>
+    <input type="text" placeholder="Full Name" id="newFullName">
+    <br>
+    <input type="password" placeholder="Password" id="newPassword">
+    <br>
+    <input type="password" placeholder="Confirm Password" id="newConfirmPassword">
+    <br>
+    <input type="text" placeholder="Email Address" id="newEmail">
+    <br>
+    <input type="text" placeholder="Lecturer key (not mandatory)" id="newAdminKey">
+    <br><br>
+    <button class='button' id="goToLogin"> Back To Login</button>
+    <button class='button' id="registerNewUser"> Register</button>
+
+</div>
+
+<div id="coursePage">
+    <input type="text" placeholder="Enter course number" id="courseNumber">
+    <br>
+    <button class='button' id="enterCourse"> Let's go!</button>
+</div>
+
+<div id="lecturePage">
+
+    <button class='button' id="hotQuestions"> Hot Questions</button>
+    <button class='button' id="recentQuestions"> Recently</button>
+    <br><br><br>
+
+    <div id="questionsArea">
+
+    </div>
+
+    <div id="enterNewQuestions">
+        <textarea id="newQuestion">Enter your Question</textarea>
+        <br>
+        <input type="checkbox" id="withName">Anonymous Name
+        <br>
+        <button class='button' id="sendQuestion">Send Question</button>
+    </div>
+
+</div>
+
+</body>
+
+</html>
