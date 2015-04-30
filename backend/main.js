@@ -17,6 +17,21 @@ app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({extended: true}));
 
+app.use(function (req, res, next) { // check admin cookie
+
+    var user = res.cookie.username;
+
+    res.params.username = user;
+
+    data.isAdmin(user, function (res) {
+
+        res.params.admin = res;
+        next();
+    });
+
+
+});
+
 app.get("/session", function (req, res) {
     var obj = {username: res.params.username};
 
@@ -160,7 +175,7 @@ app.post("/login", function (req, res) {
         }
         else {
             responseObj.admin = admin;
-            res.cookie('username', param)
+            res.cookie('username', param);
         }
         res.send(responseObj);
     });
@@ -168,19 +183,21 @@ app.post("/login", function (req, res) {
 
 app.post("/register", function (req, res) {
     var responseObj = {};
+    var username = req.param("username");
     var obj = {
-        username: req.param("username"),
+        username: username,
         password: req.param("password"),
         email: req.param("email"),
         name: req.param("name"),
         admin: isValidAdminId(req.param("adminId"))
     };
-    data.register(obj, function (err, status, admin) {
+    data.register(obj, function (err, admin) {
         if (err) {
             res.status(400);
         }
         else {
             responseObj.admin = admin;
+            res.cookie('username', username);
         }
         res.send(responseObj)
     });
