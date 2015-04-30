@@ -1,34 +1,51 @@
 var mongoose = require('mongoose');
 var schemas = require('./schemas');
+var UserModel = schemas.UserModel;
 mongoose.connect('mongodb://localhost/test');
 
-exports.validateLogin = function (username, password) {
+exports.validateLogin = function (obj, handler) {
 
-    schemas.UserModel.find({"userName": username}, function (err, user) {
+    schemas.UserModel.find({'username': obj.userName}, function (err, user) {
+
         if (!err) {
-            return loginStatus.ERROR.NO_USER;
+
+            handler(loginStatus.ERROR.NO_USER);
+
         } else {
 
-            if (user.password === password) {
+            if (user.password === obj.password) {
 
                 if (user.admin) {
 
-                    return loginStatus.ADMIN;
+                    handler(loginStatus.ADMIN);
 
                 } else {
 
-                    return loginStatus.USER;
+                    handler(loginStatus.USER);
 
                 }
 
             } else {
 
-                return loginStatus.BAD_PASSWORD;
+                handler(loginStatus.BAD_PASSWORD);
 
             }
         }
     });
 
+};
+
+exports.register = function (obj, handler) {
+
+    var user = new UserModel(obj);
+
+    user.save(function (err) {
+        if (err) {
+            handler(registerStatus.ERROR);
+        } else {
+            handler(registerStatus.OK);
+        }
+    })
 };
 
 var loginStatus = {
@@ -41,3 +58,10 @@ var loginStatus = {
 };
 
 exports.loginStatus = loginStatus;
+
+var registerStatus = {
+    ERROR: 1,
+    OK: 0
+};
+
+exports.registerStatus = registerStatus;

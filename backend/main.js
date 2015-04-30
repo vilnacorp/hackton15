@@ -19,33 +19,39 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.post("/login", function (req, res) {
 
-    var username = req.param("username");
-    var password = req.param("password");
+    var obj = {
+        username: req.param("username"),
+        password: req.param("password")
+    };
 
-    var status = data.validateLogin(username, password);
+    data.validateLogin(obj, function (status) {
 
-    var responseObj = {};
-    switch (status) {
-        case data.statusLogin.ADMIN:
-            responseObj.status = "ok";
-            responseObj.admin = true;
-            break;
+        var responseObj = {};
+        switch (status) {
+            case data.statusLogin.ADMIN:
+                responseObj.status = "ok";
+                responseObj.admin = true;
+                break;
 
-        case data.statusLogin.USER:
-            responseObj.status = "ok";
-            responseObj.admin = false;
-            break;
+            case data.statusLogin.USER:
+                responseObj.status = "ok";
+                responseObj.admin = false;
+                break;
 
-        case data.statusLogin.ERROR.NO_USER:
-            responseObj.status = "no such user";
-            break;
+            case data.statusLogin.ERROR.NO_USER:
+                responseObj.status = "no such user";
+                break;
 
-        case data.statusLogin.ERROR.BAD_PASSWORD:
-            responseObj.status = "bad password";
-            break;
+            case data.statusLogin.ERROR.BAD_PASSWORD:
+                responseObj.status = "bad password";
+                break;
 
-    }
+        }
 
-    res.send(responseObj);
+        // TODO coookie
+
+        res.send(responseObj);
+    });
+
 
 });
