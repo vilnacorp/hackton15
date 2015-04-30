@@ -17,6 +17,19 @@ app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({extended: true}));
 
+app.use(function (req, res, next) {
+
+    var user = res.cookie.userId;
+
+    data.isAdmin(user, function (res) {
+
+        res.params.admin = res;
+        next();
+    });
+
+
+});
+
 app.post("/login", function (req, res) {
 
     var obj = {
@@ -55,7 +68,9 @@ app.post("/login", function (req, res) {
 });
 
 app.post("/register", function (req, res) {
+
     var responseObj = {};
+
     var obj = {
         username: req.param("username"),
         password: req.param("password"),
@@ -63,10 +78,12 @@ app.post("/register", function (req, res) {
         name: req.param("name"),
         admin: isValidAdminId(req.param("adminId"))
     };
+
     data.register(obj, function (status) {
         responseObj.status = status;
         res.send(responseObj)
     });
+
 });
 
 function isValidAdminId(id) {
