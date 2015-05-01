@@ -1,4 +1,388 @@
+#loginPage {
+    display: block;
+}
 
-#loginPage, #registerPage, #coursePage, #lecturePage {
+#registerPage, #coursePage, #lecturePage {
     display: none;
+}
+
+#loginPage {
+    margin-top: 2%;
+}
+
+#registerPage {
+    margin-top: 2%;
+}
+
+#lecturePage {
+    margin-top: 2%;
+}
+
+img#logo {
+    max-height: 200px;
+    max-width: 200px;
+}
+
+input[type=text] {
+    padding-left: 15px;
+    margin-top: 10px;
+    width: 300px;
+    height: 45px;
+    margin-bottom: 5px;
+    border-radius: 37px 37px 37px 37px;
+    -moz-border-radius: 37px 37px 37px 37px;
+    -webkit-border-radius: 37px 37px 37px 37px;
+    border: 0px solid #000000;
+}
+
+input[type=password] {
+    padding-left: 15px;
+    margin-top: 10px;
+    width: 300px;
+    height: 45px;
+    border-radius: 37px 37px 37px 37px;
+    -moz-border-radius: 37px 37px 37px 37px;
+    -webkit-border-radius: 37px 37px 37px 37px;
+    border: 0 solid #000000;
+}
+
+.questionsList .singleQuestion {
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border: 1px solid #848484;
+    outline: 0;
+    height: 25px;
+    width: 275px;
+    font-size: 20px;
+}
+
+ul.questionsList {
+    list-style: outside none none;
+}
+
+textarea {
+    resize: both;
+    width: 50%;
+    height: 70px;
+}
+
+textarea.vert {
+    resize: vertical;
+}
+
+textarea.noResize {
+    resize: none;
+}
+
+#loginPage button {
+    margin-top: 20px;
+}
+
+.enterCourse {
+    margin-bottom: 5px;
+}
+
+button {
+    background: #3498db;
+    background-image: -webkit-linear-gradient(top, #3498db, #2980b9);
+    background-image: -moz-linear-gradient(top, #3498db, #2980b9);
+    background-image: -ms-linear-gradient(top, #3498db, #2980b9);
+    background-image: -o-linear-gradient(top, #3498db, #2980b9);
+    background-image: linear-gradient(to bottom, #3498db, #2980b9);
+    -webkit-border-radius: 2;
+    -moz-border-radius: 2;
+    border-radius: 2px;
+    font-family: Arial;
+    margin-bottom: 5px;
+    color: #ffffff;
+    font-size: 17px;
+    padding: 10px 20px 10px 20px;
+    border: solid #1f628d 2px;
+    text-decoration: none;
+}
+
+button:hover {
+    background: #3cb0fd;
+    background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+    text-decoration: none;
+}
+
+body {
+    text-align: center;
+    background: rgba(212, 228, 239, 1);
+    background: -moz-linear-gradient(left, rgba(212, 228, 239, 1) 0%, rgba(134, 174, 204, 1) 100%);
+    background: -webkit-gradient(left top, right top, color-stop(0%, rgba(212, 228, 239, 1)), color-stop(100%, rgba(134, 174, 204, 1)));
+    background: -webkit-linear-gradient(left, rgba(212, 228, 239, 1) 0%, rgba(134, 174, 204, 1) 100%);
+    background: -o-linear-gradient(left, rgba(212, 228, 239, 1) 0%, rgba(134, 174, 204, 1) 100%);
+    background: -ms-linear-gradient(left, rgba(212, 228, 239, 1) 0%, rgba(134, 174, 204, 1) 100%);
+    background: linear-gradient(to right, rgba(212, 228, 239, 1) 0%, rgba(134, 174, 204, 1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#d4e4ef', endColorstr='#86aecc', GradientType=1);
+}
+
+.card-panel {
+    padding: 20px;
+    margin: 0.5rem 0 1rem 0;
+    border-radius: 2px;
+    background-color: #fff
+}
+
+.card {
+    position: relative;
+    overflow: hidden;
+    margin: 0.5rem 0 1rem 0;
+    background-color: #fff;
+    border-radius: 2px
+}
+
+.card .card-title {
+    color: #fff;
+    font-size: 24px;
+    font-weight: 300
+}
+
+.card .card-title.activator {
+    cursor: pointer
+}
+
+.card.small, .card.medium, .card.large {
+    position: relative
+}
+
+.card.small .card-image, .card.medium .card-image, .card.large .card-image {
+    overflow: hidden
+}
+
+.card.small .card-content, .card.medium .card-content, .card.large .card-content {
+    overflow: hidden
+}
+
+.card.small .card-action, .card.medium .card-action, .card.large .card-action {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0
+}
+
+.card.small {
+    height: 300px
+}
+
+.card.small .card-image {
+    height: 150px
+}
+
+.card.small .card-content {
+    height: 150px
+}
+
+.card.medium {
+    height: 400px
+}
+
+.card.medium .card-image {
+    height: 250px
+}
+
+.card.medium .card-content {
+    height: 150px
+}
+
+.card.large {
+    height: 500px
+}
+
+.card.large .card-image {
+    height: 330px
+}
+
+.card.large .card-content {
+    height: 170px
+}
+
+.card .card-image {
+    position: relative
+}
+
+.card .card-image img {
+    border-radius: 2px 2px 0 0;
+    position: relative;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%
+}
+
+.card .card-image .card-title {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 20px
+}
+
+.card .card-content {
+    padding: 20px;
+    border-radius: 0 0 2px 2px
+}
+
+.card .card-content p {
+    margin: 0;
+    color: inherit
+}
+
+.card .card-content .card-title {
+    line-height: 48px
+}
+
+.card .card-action {
+    border-top: 1px solid rgba(160, 160, 160, 0.2);
+    padding: 20px
+}
+
+.card .card-action a {
+    color: #ffab40;
+    margin-right: 20px;
+    -webkit-transition: color .3s ease;
+    -moz-transition: color .3s ease;
+    -o-transition: color .3s ease;
+    -ms-transition: color .3s ease;
+    transition: color .3s ease;
+    text-transform: uppercase
+}
+
+.card .card-action a:hover {
+    color: #ffd8a6
+}
+
+.card .card-reveal {
+    padding: 20px;
+    position: absolute;
+    background-color: #FFF;
+    width: 100%;
+    overflow-y: auto;
+    top: 100%;
+    height: 100%;
+    z-index: 1;
+    display: none
+}
+
+.card .card-reveal .card-title {
+    cursor: pointer;
+    display: block
+}
+
+.white-text {
+    word-break: break-all;
+    color: #FFFFFF !important
+}
+
+.blue-grey.lighten-5 {
+    background-color: #eceff1 !important
+}
+
+.blue-grey-text.text-lighten-5 {
+    color: #eceff1 !important
+}
+
+.blue-grey.lighten-4 {
+    background-color: #cfd8dc !important
+}
+
+.blue-grey-text.text-lighten-4 {
+    color: #cfd8dc !important
+}
+
+.blue-grey.lighten-3 {
+    background-color: #b0bec5 !important
+}
+
+.blue-grey-text.text-lighten-3 {
+    color: #b0bec5 !important
+}
+
+.blue-grey.lighten-2 {
+    background-color: #90a4ae !important
+}
+
+.blue-grey-text.text-lighten-2 {
+    color: #90a4ae !important
+}
+
+.blue-grey.lighten-1 {
+    background-color: #78909c !important
+}
+
+.blue-grey-text.text-lighten-1 {
+    color: #78909c !important
+}
+
+.blue-grey {
+    background-color: #607d8b !important
+}
+
+.blue-grey-text {
+    color: #607d8b !important
+}
+
+.blue-grey.darken-1 {
+    background-color: #546e7a !important
+}
+
+.blue-grey-text.text-darken-1 {
+    color: #546e7a !important
+}
+
+.blue-grey.darken-2 {
+    background-color: #455a64 !important
+}
+
+.blue-grey-text.text-darken-2 {
+    color: #455a64 !important
+}
+
+.blue-grey.darken-3 {
+    background-color: #37474f !important
+}
+
+.blue-grey-text.text-darken-3 {
+    color: #37474f !important
+}
+
+.blue-grey.darken-4 {
+    background-color: #263238 !important
+}
+
+.blue-grey-text.text-darken-4 {
+    color: #263238 !important
+}
+
+.row .col.m6 {
+    width: 50%;
+    margin-left: 0
+}
+
+.questionTime {
+    float: left;
+    margin-right: 10px;
+}
+
+.questionName {
+    float: left;
+}
+
+.questionRanking {
+    float: right;
+}
+
+.questionLike {
+    float: right;
+}
+
+.questionAnswered {
+    float: right;
 }

@@ -1,6 +1,8 @@
 $(document).ready(function () {
 
     checkIfLogged(function (data) {
+        isAdmin = data.admin;
+
         if (data.status) {
             navigate("loginPage", "coursePage");
         } else {
@@ -109,6 +111,7 @@ function courseValidation() {
                 currentCourseNumber = courseNumber;
                 liveLecture();
                 startTimer();
+                $("#courseTitle").text("Course number : " + currentCourseNumber.toString());
                 navigate("coursePage", "lecturePage");
             }
         })

@@ -7,11 +7,11 @@
     <script src="/controllers/lecture.js"></script>
     <script src="/controllers/login.js"></script>
     <script src="/controllers/main.js"></script>
+
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <title>Qrank - by Vilna Corp.</title>
 </head>
-<body>
+<body align="center">
 
 <img src="/style/logo.png" id="logo"/>
 <br>
@@ -52,21 +52,30 @@
 
 <div id="lecturePage">
 
+    <h3 id="courseTitle"></h3>
+
+    <div id="enterNewQuestions">
+        <textarea id="newQuestion" onfocus="RemoveText(this);">Enter your Question</textarea>
+
+        <br>
+        <input type="checkbox" id="withName">Anonymous
+        <br><br>
+
+        <button class='button' id="backToCourse">Back</button>
+        <button class='button' id="sendQuestion">Send</button>
+    </div>
+
+    <br>
+
     <button class='button' id="hotQuestions"> Hot Questions</button>
     <button class='button' id="recentQuestions"> Recently</button>
-    <br><br><br>
+    <button class='button' id="answeredQuestions"> Answered</button>
+    <br>
 
     <div id="questionsArea">
 
     </div>
 
-    <div id="enterNewQuestions">
-        <textarea id="newQuestion" onfocus="RemoveText(this);">Enter your Question</textarea>
-        <br>
-        <input type="checkbox" id="withName">Anonymous Name
-        <br>
-        <button class='button' id="sendQuestion">Send Question</button>
-    </div>
 
 </div>
 

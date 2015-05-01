@@ -256,6 +256,7 @@ app.post("/register", function (req, res) {
     };
     data.register(obj, function (err, admin) {
         if (err) {
+
             res.status(400);
         }
         else {

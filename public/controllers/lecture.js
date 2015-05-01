@@ -6,16 +6,33 @@ $(document).ready(function () {
 
     $('#hotQuestions').click(function () {
         displayTab = "HOT";
+        $(".questionLike").show();
+        $(".questionAnswered").show();
         liveLecture();
     });
 
     $('#recentQuestions').click(function () {
         displayTab = "RECENT";
+        $(".questionLike").show();
+        $(".questionAnswered").show();
         liveLecture();
+    });
+
+    $("#answeredQuestions").click(function () {
+        displayTab = "ANSWERED";
+        $(".questionLike").hide();
+        $(".questionAnswered").hide();
+        liveLecture();
+    });
+
+    $("#backToCourse").click(function () {
+        $("#courseNumber").val("");
+        navigate("lecturePage", "coursePage");
     });
 
     $('#sendQuestion').click(function () {
         var text = $('#newQuestion').val();
+        $('#newQuestion').val("Enter your Question");
         if (text === "Enter your Question" || text === "") {
             alert("Enter your question before submit");
         } else {
@@ -26,6 +43,7 @@ $(document).ready(function () {
     });
 
     $(document).on('change', '.questionLike', updateSingleQuestions);
+    $(document).on('change', '.questionAnswered', updateSingleQuestions);
 
 });
 function startTimer() {
@@ -34,50 +52,93 @@ function startTimer() {
 
 function liveLecture() {
 
-
     updateQuestions(function (data) {
-        questions = data;
+
+        var questionsToInject;
+
+        updateList(data);
         switch (displayTab) {
             case "HOT":
                 questions.sort(compareByVotes);
+                questionsToInject = createQuestionHtml(questions);
                 break;
             case "RECENT":
                 questions.sort(compareByTime);
+                questionsToInject = createQuestionHtml(questions);
+                break;
+            case "ANSWERED":
+                questionsToInject = createQuestionHtml(answeredQuestions);
                 break;
         }
-        var questionsToInject = createQuestionHtml();
 
-        $('#questionsArea').children("ul").remove();
-        $('#questionsArea').append(questionsToInject);
+        var $questionsArea = $('#questionsArea');
+        $questionsArea.children(".questionsList").remove();
+        $questionsArea.append(questionsToInject);
     });
 
 }
 
 
-function createQuestionHtml() {
-    var template = '<ul>';
+function createQuestionHtml(questions) {
+    var checkBoxClass = '';
+    if (isAdmin) {
+        checkBoxClass = "questionAnswered";
+    } else {
+        checkBoxClass = "questionLike";
+    }
+    var template = '<div class="questionsList" align="center">';
     var isCheck = '';
     for (var i = 0; i < questions.length; i++) {
         var question = questions[i];
-        if (question.voted) {
+
+        var res = isAdmin ? question.answered : question.voted;
+
+        if (res) {
             isCheck = 'checked';
         } else {
             isCheck = '';
         }
-        template
-            += '<li class="singleQuestion">'
-            + '<span class="questionTime">' + question.time + '</span>'
-            + '<span class="questionName">' + question['sender'] + '</span>'
-            + '<span class="questionTitle">' + question.questionTitle + '</span>'
-            + '<input type="checkbox" class="questionLike" id="like' + question.questionId.toString() + '" ' + isCheck +
-            '>'
-            + '<span class="questionRanking">' + question.ranking + '</span>'
-            + '</li>';
+
+        var checkbox = "";
+        if (displayTab !== 'ANSWERED') {
+            checkbox = '<span class="' + checkBoxClass + '">' + '<input type="checkbox" class="' + checkBoxClass +
+                '" id="like' +
+                question.questionId.toString() + '" ' +
+                isCheck + '>' + '</span>';
+        }
+
+        template += '<div class="row">' +
+            ' <div class="col s12 m6">' +
+            '<div class="card blue-grey darken-1">' +
+            '<div class="card-content white-text">' +
+            '<span class="card-title"></span>' +
+            '<p>' + question.questionTitle + '</p>' +
+            '</div>' +
+            '<div class="card-action">' +
+            '<span class="questionTime white-text">' + question.time + '</span>  ' +
+            '<span class="questionName white-text">' + question.sender + '</span>' +
+            '<span class="questionRanking white-text">' + question.ranking + '</span>' +
+            checkbox +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '</div>';
+
+        //template
+        //    += '<tr class="singleQuestion">'
+        //    + '<td class="questionTime">' + question.time + '</td>'
+        //    + '<td class="questionName">' + question.sender + '</td>'
+        //    + '<td class="questionTitle">' + question.questionTitle + '</td>'
+        //    + '<td class="questionLike"><input type="checkbox" class="' + checkBoxClass + '" id="like' +
+        //    question.questionId.toString() + '" ' +
+        //    isCheck + '></td>'
+        //    + '<td class="questionRanking">' + question.ranking + '</td>'
+        //    + '</tr>';
         $('#like' + question.questionId.toString()).change(updateSingleQuestions)
 
     }
 
-    template += '</ul>';
+    template += '</div>';
     return template;
 }
 
@@ -85,10 +146,19 @@ function updateSingleQuestions() {
 
     var questionId = $(this).attr("id");
     var isLike = $(this).is(':checked');
+    if (!questionId) {
+        return;
+    }
     questionId = questionId.substring(4);
-    updateSingleRank(questionId, isLike, function () {
-        liveLecture();
-    });
+    if (isAdmin) {
+        moveToAnswered(questionId, function () {
+            liveLecture();
+        });
+    } else {
+        updateSingleRank(questionId, isLike, function () {
+            liveLecture();
+        });
+    }
 
 }
 
@@ -118,7 +188,17 @@ function updateSingleRank(questionId, isLike, callback) {
         }
 
     })
+}
 
+function moveToAnswered(questionId, callback) {
+    $.ajax({
+        url: '/backend/session/' + currentCourseNumber + '/question/' + questionId + '/answer',
+        type: 'put',
+        data: {},
+        success: function (data) {
+            callback(data);
+        }
+    })
 }
 
 

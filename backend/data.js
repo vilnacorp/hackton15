@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/test3', function (err) {
+mongoose.connect('mongodb://localhost:12345/test3', function (err) {
 
 });
 
@@ -33,9 +33,13 @@ exports.validateLogin = function (obj, handler) {
 
 exports.register = function (obj, handler) {
 
+
     var user = new UserModel(obj);
 
     user.save(function (err, u) {
+
+        console.log(err);
+
         if (err || !u) {
 
             handler(true);
@@ -169,12 +173,6 @@ exports.addSession = function (obj, handler) {
 
 };
 
-exports.addSession({
-    sessionId: 52005,
-    username: "vilna",
-    title: "vilna"
-}, function () {
-});
 
 exports.joinToSession = function (obj, handler) {
 
